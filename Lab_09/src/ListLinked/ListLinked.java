@@ -54,6 +54,36 @@ public class ListLinked<T> {
         return search(data) != -1;
     }
 
+    // Devuelve la longitud (cantidad de elementos) de la lista
+    public int length() {
+        int count = 0;
+        Node<T> current = head;
+        while (current != null) {
+            count++;
+            current = current.getNext();
+        }
+        return count;
+    }
+
+    // Elimina la primera aparición del dato en la lista
+    public void remove(T data) {
+        if (head == null) return;
+
+        if (head.getData().equals(data)) {
+            head = head.getNext();
+            return;
+        }
+
+        Node<T> current = head;
+        while (current.getNext() != null) {
+            if (current.getNext().getData().equals(data)) {
+                current.setNext(current.getNext().getNext());
+                return;
+            }
+            current = current.getNext();
+        }
+    }
+
     // Devuelve la representación en String de la lista
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -68,4 +98,3 @@ public class ListLinked<T> {
         return sb.toString();
     }
 }
-

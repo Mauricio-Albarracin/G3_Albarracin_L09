@@ -80,4 +80,61 @@ public class GraphLink<E> {
     public String toString() {
         return this.listVertex.toString();
     }
+
+    // a) Elimina el vértice ‘v’ en caso exista. 
+    // Asegúrese de no dejar aristas de entrada y/o salida del vértice.
+    public void removeVertex(E v) {
+        Vertex<E> target = new Vertex<>(v);
+        int pos = listVertex.search(target);
+
+        if (pos == -1) return; // Si no existe, no se hace nada
+
+        // Eliminar aristas entrantes desde otros vértices
+        for (int i = 0; i < listVertex.length(); i++) {
+            Vertex<E> current = listVertex.get(i);
+            if (current != null && !current.equals(target)) {
+                current.listAdj.remove(new Edge<>(target));
+            }
+        }
+
+        // Eliminar el vértice (sus aristas salientes también se eliminan)
+        listVertex.remove(target);
+    }
+
+    // b) Elimina la arista que une a los vértices ‘v’ y ‘z’ en caso exista.
+    public void removeEdge(E v, E z) {
+        int posOri = listVertex.search(new Vertex<>(v));
+        int posDes = listVertex.search(new Vertex<>(z));
+
+        if (posOri == -1 || posDes == -1) return; // Uno o ambos vértices no existen
+
+        Vertex<E> vOri = listVertex.get(posOri);
+        Vertex<E> vDes = listVertex.get(posDes);
+
+        vOri.listAdj.remove(new Edge<>(vDes)); // Elimina la arista de v hacia z
+    }
+
+    // c) Realiza el recorrido en profundidad a partir de v del grafo y muestra los vértices que se vayan visitando.
+    public void dfs(E v) {
+        int pos = listVertex.search(new Vertex<>(v));
+        if (pos == -1) return; // Si el vértice no existe, no se hace nada
+
+        boolean[] visited = new boolean[listVertex.length()];
+        dfsRecursive(pos, visited);
+    }
+
+    // Método recursivo auxiliar para DFS
+    private void dfsRecursive(int pos, boolean[] visited) {
+        visited[pos] = true;
+        Vertex<E> vertex = listVertex.get(pos);
+        System.out.println(vertex.getData()); // Muestra el vértice visitado
+
+        for (int i = 0; i < vertex.listAdj.length(); i++) {
+            Edge<E> edge = vertex.listAdj.get(i);
+            int nextPos = listVertex.search(edge.getRefDest());
+            if (nextPos != -1 && !visited[nextPos]) {
+                dfsRecursive(nextPos, visited);
+            }
+        }
+    }
 }
