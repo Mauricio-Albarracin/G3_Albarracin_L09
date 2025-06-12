@@ -496,5 +496,94 @@ public class GraphLink<E> {
         return true;
     }
 
-    
+    // Ejercicio 6
+    // Ejercicio a
+    // Muestra la representación formal del grafo:
+    // Vértices: V = {A, B, C}
+    // Aristas: E = {(A, B), (B, C), (C, A)}
+    public void mostrarFormal() {
+        System.out.print("V = {");
+        for (int i = 0; i < listVertex.length(); i++) {
+            System.out.print(listVertex.get(i).getData());
+            if (i < listVertex.length() - 1) System.out.print(", ");
+        }
+        System.out.println("}");
+
+        System.out.print("E = {");
+        boolean primero = true;
+        for (int i = 0; i < listVertex.length(); i++) {
+            Vertex<E> v = listVertex.get(i);
+            for (int j = 0; j < v.listAdj.length(); j++) {
+                Edge<E> e = v.listAdj.get(j);
+                // Para evitar duplicados en grafo no dirigido, solo mostramos si origen < destino
+                if (v.getData().toString().compareTo(e.getRefDest().getData().toString()) < 0) {
+                    if (!primero) System.out.print(", ");
+                    System.out.print("(" + v.getData() + ", " + e.getRefDest().getData() + ")");
+                    primero = false;
+                }
+            }
+        }
+        System.out.println("}");
+    }
+
+    // Ejercicio 6
+    // Ejercicio b
+    // Muestra la lista de adyacencias de cada nodo:
+    // Ejemplo:
+    // A -> B, C
+    // B -> A, C
+    // C -> A, B
+    public void mostrarAdyacencias() {
+        for (int i = 0; i < listVertex.length(); i++) {
+            Vertex<E> v = listVertex.get(i);
+            System.out.print(v.getData() + " -> ");
+            for (int j = 0; j < v.listAdj.length(); j++) {
+                System.out.print(v.listAdj.get(j).getRefDest().getData());
+                if (j < v.listAdj.length() - 1) System.out.print(", ");
+            }
+            System.out.println();
+        }
+    }
+
+    // Ejercicio 6
+    // Ejercicio c
+    // Muestra la matriz de adyacencia:
+    //    A B C
+    // A [0 1 1]
+    // B [1 0 1]
+    // C [1 1 0]
+    public void mostrarMatrizAdyacencia() {
+        int n = listVertex.length();
+        int[][] matriz = new int[n][n];
+
+        // Rellenamos la matriz
+        for (int i = 0; i < n; i++) {
+            Vertex<E> v = listVertex.get(i);
+            for (int j = 0; j < v.listAdj.length(); j++) {
+                Vertex<E> destino = v.listAdj.get(j).getRefDest();
+                int posDestino = listVertex.search(destino);
+                if (posDestino != -1) {
+                    matriz[i][posDestino] = 1;
+                }
+            }
+        }
+
+        // Mostrar encabezado
+        System.out.print("    ");
+        for (int i = 0; i < n; i++) {
+            System.out.print(listVertex.get(i).getData() + " ");
+        }
+        System.out.println();
+
+        // Mostrar matriz
+        for (int i = 0; i < n; i++) {
+            System.out.print(listVertex.get(i).getData() + " [");
+            for (int j = 0; j < n; j++) {
+                System.out.print(matriz[i][j]);
+                if (j < n - 1) System.out.print(" ");
+            }
+            System.out.println("]");
+        }
+    }   
+
 }
