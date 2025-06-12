@@ -227,6 +227,7 @@ public class GraphLink<E> {
     return reversePath;
     }
 
+    // Ejercicio 2
     // a) Inserta una arista no dirigida con peso entre los vértices v y z
     public void insertEdgeWeight(E v, E z, int w) {
         Vertex<E> ori = new Vertex<>(v);
@@ -262,6 +263,7 @@ public class GraphLink<E> {
         }
     }
 
+    // Ejercicio 2
     // b) Calcula el camino más corto entre dos vértices usando Dijkstra y lo devuelve como ArrayList
     public ArrayList<E> shortPath(E v, E z) {
         ArrayList<E> path = new ArrayList<>();
@@ -327,6 +329,7 @@ public class GraphLink<E> {
         return path;
     }
 
+    // Ejercicio 2
     // c) Verifica si el grafo es conexo (todos los vértices son alcanzables desde cualquiera)
     public boolean isConexo() {
         if (listVertex.length() == 0) return true; // Grafo vacío es conexo por definición
@@ -341,6 +344,7 @@ public class GraphLink<E> {
         return true;
     }
 
+    // Ejercicio 2
     // d) Devuelve un Stack con el camino más corto desde v hasta w usando Dijkstra
     public Stack<E> Dijkstra(E v, E w) {
         Stack<E> stack = new Stack<>();

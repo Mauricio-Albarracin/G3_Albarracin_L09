@@ -1,6 +1,5 @@
 package ListLinked;
 
-
 public class ListLinked<T> {
     private Node<T> head;
 
