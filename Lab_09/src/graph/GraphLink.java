@@ -409,5 +409,92 @@ public class GraphLink<E> {
         return stack;
     }
 
+    // Ejercicio 5
+    // a) Grado de un nodo (Gx), cantidad de aristas conectadas del nodo. (G3, G4, G5).
+    // Devuelve el grado del nodo (cantidad de conexiones)
+    public int gradoNodo(E data) {
+        int pos = listVertex.search(new Vertex<>(data));
+        if (pos == -1) return -1;
+        
+        Vertex<E> v = listVertex.get(pos);
+        int grado = v.listAdj.length();
+        
+        // Como es no dirigido, hay que contar las aristas entrantes también
+        for (int i = 0; i < listVertex.length(); i++) {
+            if (i == pos) continue;
+            Vertex<E> u = listVertex.get(i);
+            if (u.listAdj.search(new Edge<>(v)) != -1) {
+                grado++;
+            }
+        }
+        return grado;
+    }
+
+    // Ejercicio 5
+    /* b) Camino(Px): si todas las aristas de los nodos están conectadas, 
+    pero sin conectar el inicio ni el final. (P3, P4, P5).*/
+    public boolean esCamino() {
+        int extremos = 0;
+
+        for (int i = 0; i < listVertex.length(); i++) {
+            int grado = gradoNodo(listVertex.get(i).getData());
+            if (grado == 1) extremos++;           // extremos
+            else if (grado != 2) return false;    // todos deben tener grado 2 excepto 2 extremos
+        }
+
+        return extremos == 2;
+    }
+
+    // Ejercicio 5
+    /* c) Ciclo (Cx): si todas las aristas de los nodos están conectadas, conectando el inicio y el final. 
+    (C3, C4, C5). */
+    public boolean esCiclo() {
+        for (int i = 0; i < listVertex.length(); i++) {
+            int grado = gradoNodo(listVertex.get(i).getData());
+            if (grado != 2) return false;
+        }
+        return true;
+    }
+
+    // Ejercicio 5
+    /* d) Rueda (Wx): si todos los nodos están conectados menos uno formando un ciclo, 
+    pero el suelto esta conectado con todos los demás, conectando el inicio y el final. (W3, W4, W5). */
+
+    public boolean esRueda() {
+        int centro = -1;
+        int n = listVertex.length();
+
+        // Contar cuántos tienen grado n-1 (el centro)
+        for (int i = 0; i < n; i++) {
+            int grado = gradoNodo(listVertex.get(i).getData());
+            if (grado == n - 1) {
+                if (centro != -1) return false; // debe haber un solo centro
+                centro = i;
+            }
+        }
+
+        if (centro == -1) return false;
+
+        // El resto deben tener grado 3 (dos en ciclo + uno hacia el centro)
+        for (int i = 0; i < n; i++) {
+            if (i == centro) continue;
+            int grado = gradoNodo(listVertex.get(i).getData());
+            if (grado != 3) return false;
+        }
+
+        return true;
+    }
+
+    // Ejercicio 5
+    // e) Completo (Kx), si todos los nodos y sus vértices están conectados entre sí. (K4, K5, K6)
+    public boolean esCompleto() {
+        int n = listVertex.length();
+        for (int i = 0; i < n; i++) {
+            int grado = gradoNodo(listVertex.get(i).getData());
+            if (grado != n - 1) return false;
+        }
+        return true;
+    }
+
     
 }
