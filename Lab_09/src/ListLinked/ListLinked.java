@@ -1,5 +1,6 @@
 package ListLinked;
 
+
 public class ListLinked<T> {
     private Node<T> head;
 
@@ -97,4 +98,5 @@ public class ListLinked<T> {
         }
         return sb.toString();
     }
+   
 }

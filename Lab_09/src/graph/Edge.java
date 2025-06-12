@@ -29,4 +29,5 @@ public class Edge<E> {
         if (this.weight > -1) return refDest.getData()+" ["+this.weight+"], "; 
         else return refDest.getData()+", ";
     }
+    
 }

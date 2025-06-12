@@ -1,4 +1,6 @@
 package graph;
+
+import java.util.ArrayList;
 import ListLinked.*;
 
 public class GraphLink<E> {
@@ -119,22 +121,108 @@ public class GraphLink<E> {
         int pos = listVertex.search(new Vertex<>(v));
         if (pos == -1) return; // Si el vértice no existe, no se hace nada
 
-        boolean[] visited = new boolean[listVertex.length()];
-        dfsRecursive(pos, visited);
+        boolean[] visitado = new boolean[listVertex.length()];
+        dfsRecursive(pos, visitado);
     }
 
     // Método recursivo auxiliar para DFS
-    private void dfsRecursive(int pos, boolean[] visited) {
-        visited[pos] = true;
+    private void dfsRecursive(int pos, boolean[] visitado) {
+        visitado[pos] = true;
         Vertex<E> vertex = listVertex.get(pos);
         System.out.println(vertex.getData()); // Muestra el vértice visitado
 
         for (int i = 0; i < vertex.listAdj.length(); i++) {
             Edge<E> edge = vertex.listAdj.get(i);
             int nextPos = listVertex.search(edge.getRefDest());
-            if (nextPos != -1 && !visited[nextPos]) {
-                dfsRecursive(nextPos, visited);
+            if (nextPos != -1 && !visitado[nextPos]) {
+                dfsRecursive(nextPos, visitado);
             }
         }
     }
+
+    // Elercicio 1
+    // a) Realiza el recorrido en anchura (BFS) a partir de v y muestra los vértices visitados
+    public void bfs(E v) {
+        int pos = listVertex.search(new Vertex<>(v));
+        if (pos == -1) return; // Si el vértice no existe, no se hace nada
+
+        boolean[] visitado = new boolean[listVertex.length()];
+        ListLinked<Integer> queue = new ListLinked<>(); // Cola de posiciones (índices de vértices)
+
+        visitado[pos] = true;
+        queue.insertLast(pos); // Encolar vértice inicial
+
+        while (queue.length() > 0) {
+            // Desencolar
+            int currentPos = queue.get(0);
+            queue.remove(currentPos);
+
+            Vertex<E> currentVertex = listVertex.get(currentPos);
+            System.out.println(currentVertex.getData()); // Mostrar vértice
+
+            // Recorrer los adyacentes
+            for (int i = 0; i < currentVertex.listAdj.length(); i++) {
+                Edge<E> edge = currentVertex.listAdj.get(i);
+                int nextPos = listVertex.search(edge.getRefDest());
+                if (nextPos != -1 && !visitado[nextPos]) {
+                    visitado[nextPos] = true;
+                    queue.insertLast(nextPos); // Encolar adyacente no visitado
+                }
+            }
+        }
+    }
+
+    //Ejercicio 1
+    /* b) bfsPath(v, z): que es la especialización del método bfs() que devuelva el camino (secuencia de vértices) 
+    entre el vértice ‘v’ y ‘z’ en caso exista en un ArrayList. */ 
+    
+    public ArrayList<E> bfsPath(E v, E z) {
+    ArrayList<E> path = new ArrayList<>();
+    int inicio = listVertex.search(new Vertex<>(v));
+    int meta = listVertex.search(new Vertex<>(z));
+
+    if (inicio == -1 || meta == -1) return path; // Si alguno no existe, retorno vacío
+
+    boolean[] visitado = new boolean[listVertex.length()];
+    int[] padre = new int[listVertex.length()];
+
+    // Inicializa los padres en -1
+    for (int i = 0; i < padre.length; i++) padre[i] = -1;
+
+    // Simulación de una cola usando ListLinked de enteros (posiciones)
+    ListLinked<Integer> queue = new ListLinked<>();
+    queue.insertLast(inicio);
+    visitado[inicio] = true;
+
+    while (queue.length() > 0) {
+        int current = queue.get(0);
+        queue.remove(current); // Elimina de la cabeza (simula dequeue)
+
+        Vertex<E> vCurrent = listVertex.get(current);
+
+        for (int i = 0; i < vCurrent.listAdj.length(); i++) {
+            Edge<E> edge = vCurrent.listAdj.get(i);
+            int neighbor = listVertex.search(edge.getRefDest());
+
+            if (!visitado[neighbor]) {
+                visitado[neighbor] = true;
+                padre[neighbor] = current;
+                queue.insertLast(neighbor);
+
+                if (neighbor == meta) break; // Se encontró el destino
+            }
+        }
+    }
+
+    // Si no hay camino al destino
+    if (!visitado[meta]) return path;
+
+    // Reconstruir el camino desde z a v
+    ArrayList<E> reversePath = new ArrayList<>();
+    for (int at = meta; at != -1; at = padre[at]) {
+        reversePath.add(0, listVertex.get(at).getData());
+    }
+    return reversePath;
+    }
+
 }
