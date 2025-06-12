@@ -1,6 +1,8 @@
 package graph;
 
 import java.util.ArrayList;
+import java.util.Stack;
+
 import ListLinked.*;
 
 public class GraphLink<E> {
@@ -225,4 +227,183 @@ public class GraphLink<E> {
     return reversePath;
     }
 
+    // a) Inserta una arista no dirigida con peso entre los vértices v y z
+    public void insertEdgeWeight(E v, E z, int w) {
+        Vertex<E> ori = new Vertex<>(v);
+        Vertex<E> des = new Vertex<>(z);
+
+        int posOri = listVertex.search(ori);
+        int posDes = listVertex.search(des);
+
+        // Si alguno de los vértices no existe, se inserta
+        if (posOri == -1) {
+            insertVertex(v);
+            posOri = listVertex.search(ori);
+        }
+        if (posDes == -1) {
+            insertVertex(z);
+            posDes = listVertex.search(des);
+        }
+
+        // Obtener referencias reales de los vértices
+        Vertex<E> vOri = listVertex.get(posOri);
+        Vertex<E> vDes = listVertex.get(posDes);
+
+        // Crear aristas con peso w
+        Edge<E> edgeToDes = new Edge<>(vDes, w);
+        Edge<E> edgeToOri = new Edge<>(vOri, w);
+
+        // Insertar aristas si no existen aún
+        if (vOri.listAdj.search(edgeToDes) == -1) {
+            vOri.listAdj.insertLast(edgeToDes);
+        }
+        if (vDes.listAdj.search(edgeToOri) == -1) {
+            vDes.listAdj.insertLast(edgeToOri);
+        }
+    }
+
+    // b) Calcula el camino más corto entre dos vértices usando Dijkstra y lo devuelve como ArrayList
+    public ArrayList<E> shortPath(E v, E z) {
+        ArrayList<E> path = new ArrayList<>();
+
+        int n = listVertex.length();
+        int[] dist = new int[n]; // Distancia mínima
+        int[] prev = new int[n]; // Predecesores
+        boolean[] visited = new boolean[n];
+
+        // Inicialización
+        for (int i = 0; i < n; i++) {
+            dist[i] = Integer.MAX_VALUE;
+            prev[i] = -1;
+            visited[i] = false;
+        }
+
+        int start = listVertex.search(new Vertex<>(v));
+        int end = listVertex.search(new Vertex<>(z));
+
+        if (start == -1 || end == -1) return path; // Si uno no existe
+
+        dist[start] = 0;
+
+        for (int i = 0; i < n; i++) {
+            // Encontrar el vértice no visitado con menor distancia
+            int u = -1;
+            int minDist = Integer.MAX_VALUE;
+            for (int j = 0; j < n; j++) {
+                if (!visited[j] && dist[j] < minDist) {
+                    u = j;
+                    minDist = dist[j];
+                }
+            }
+
+            if (u == -1) break; // Todos visitados o inaccesible
+            visited[u] = true;
+
+            Vertex<E> vU = listVertex.get(u);
+
+            // Revisar vecinos de u
+            for (int j = 0; j < vU.listAdj.length(); j++) {
+                Edge<E> edge = vU.listAdj.get(j);
+                int vIndex = listVertex.search(edge.getRefDest());
+                int weight = edge.getWeight();
+
+                // Relajación de la distancia
+                if (!visited[vIndex] && dist[u] + weight < dist[vIndex]) {
+                    dist[vIndex] = dist[u] + weight;
+                    prev[vIndex] = u;
+                }
+            }
+        }
+
+        // Reconstruir camino desde z a v
+        if (dist[end] == Integer.MAX_VALUE) return path; // No hay camino
+
+        int current = end;
+        while (current != -1) {
+            path.add(0, listVertex.get(current).getData());
+            current = prev[current];
+        }
+
+        return path;
+    }
+
+    // c) Verifica si el grafo es conexo (todos los vértices son alcanzables desde cualquiera)
+    public boolean isConexo() {
+        if (listVertex.length() == 0) return true; // Grafo vacío es conexo por definición
+
+        boolean[] visited = new boolean[listVertex.length()];
+        dfsRecursive(0, visited); // Hacer DFS desde el primer vértice
+
+        // Verificar si todos fueron visitados
+        for (boolean v : visited) {
+            if (!v) return false;
+        }
+        return true;
+    }
+
+    // d) Devuelve un Stack con el camino más corto desde v hasta w usando Dijkstra
+    public Stack<E> Dijkstra(E v, E w) {
+        Stack<E> stack = new Stack<>();
+
+        int n = listVertex.length();
+        int[] dist = new int[n];    // Distancia mínima desde v
+        int[] prev = new int[n];    // Predecesor de cada vértice
+        boolean[] visited = new boolean[n];
+
+        // Inicialización
+        for (int i = 0; i < n; i++) {
+            dist[i] = Integer.MAX_VALUE;
+            prev[i] = -1;
+            visited[i] = false;
+        }
+
+        int start = listVertex.search(new Vertex<>(v));
+        int end = listVertex.search(new Vertex<>(w));
+
+        if (start == -1 || end == -1) return stack; // Alguno no existe
+
+        dist[start] = 0;
+
+        for (int i = 0; i < n; i++) {
+            // Elegir el vértice no visitado con menor distancia
+            int u = -1;
+            int minDist = Integer.MAX_VALUE;
+            for (int j = 0; j < n; j++) {
+                if (!visited[j] && dist[j] < minDist) {
+                    u = j;
+                    minDist = dist[j];
+                }
+            }
+
+            if (u == -1) break;
+            visited[u] = true;
+
+            Vertex<E> vU = listVertex.get(u);
+
+            // Examinar cada vecino
+            for (int j = 0; j < vU.listAdj.length(); j++) {
+                Edge<E> edge = vU.listAdj.get(j);
+                int neighborIndex = listVertex.search(edge.getRefDest());
+
+                if (!visited[neighborIndex] && dist[u] + edge.getWeight() < dist[neighborIndex]) {
+                    dist[neighborIndex] = dist[u] + edge.getWeight();
+                    prev[neighborIndex] = u;
+                }
+            }
+        }
+
+        // Reconstrucción del camino en stack (de w a v)
+        if (dist[end] == Integer.MAX_VALUE) return stack; // No hay camino
+
+        int current = end;
+        while (current != -1) {
+            stack.push(listVertex.get(current).getData());
+            current = prev[current];
+        }
+
+        // El stack ya tiene el orden desde w hasta v (inverso), lo dejamos así porque es lo requerido
+        return stack;
+    }
+
+    
 }

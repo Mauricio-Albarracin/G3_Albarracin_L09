@@ -9,9 +9,13 @@ public class Edge<E> {
     }
 
     public Vertex<E> getRefDest() {
-    return refDest;
+        return refDest;
     }
 
+    public int getWeight() {
+        return weight;
+    }
+    
     public Edge (Vertex<E> refDest, int weight) {
         this.refDest = refDest;
         this.weight = weight;
